@@ -17,10 +17,15 @@ public class Box<T> {
 
     }
 
+    // 4. Create a method to set a new item
     public void setBoxItem(T newItem) {
         this.value = newItem;
     }
-    // 4. Create a method to set a new item
     // 5. Create a method that checks if box is empty
+
+    public boolean checkIfBoxIsEmpty() {
+        return this.value == null;
+
+    }
     // 6. Override toString() to display the item            
 }
