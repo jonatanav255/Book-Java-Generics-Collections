@@ -11,11 +11,15 @@ public class Box<T> {
 
     }
 
+    // 3. Create a method to get the item
     public T getBoxItem() {
         return this.value;
 
     }
-    // 3. Create a method to get the item
+
+    public void setBoxItem(T newItem) {
+        this.value = newItem;
+    }
     // 4. Create a method to set a new item
     // 5. Create a method that checks if box is empty
     // 6. Override toString() to display the item            
