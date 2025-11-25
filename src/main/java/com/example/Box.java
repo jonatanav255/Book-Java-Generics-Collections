@@ -27,5 +27,11 @@ public class Box<T> {
         return this.value == null;
 
     }
-    // 6. Override toString() to display the item            
+
+    // 6. Override toString() to display the item          
+    @Override
+    public String toString() {
+
+        return "Box contains: " + value;
+    }
 }
