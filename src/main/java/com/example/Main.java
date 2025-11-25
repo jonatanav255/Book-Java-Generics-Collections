@@ -1,11 +1,26 @@
 package com.example;
 
+import java.math.BigDecimal;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello from Java Generics and Collections!");
-        System.out.println("Arguments passed: " + args.length);
-        for (int i = 0; i < args.length; i++) {
-            System.out.println("  arg[" + i + "]: " + args[i]);
-        }
+           // Create a box for Strings
+        Box<String> stringBox = new Box<>("Hello");
+        System.out.println(stringBox);  // Should print: Box[Hello]
+        
+        // Create a box for Integers
+        Box<Integer> intBox = new Box<>(42);
+        System.out.println(intBox.getBoxItem());  // Should print: 42
+        
+        // Create a box for BigDecimal
+        Box<BigDecimal> moneyBox = new Box<>(new BigDecimal("100.50"));
+        System.out.println(moneyBox.getBoxItem());  // Should print: 100.50
+        
+        // Change the value
+        intBox.setBoxItem(99);
+        System.out.println(intBox.getBoxItem());  // Should print: 99
+
+        
+        System.out.println(intBox.toString());
     }
 }
