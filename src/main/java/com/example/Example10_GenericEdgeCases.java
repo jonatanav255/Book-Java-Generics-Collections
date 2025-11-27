@@ -151,6 +151,10 @@ public class Example10_GenericEdgeCases {
         // But this has: void setData(String data)
         // Compiler creates bridge: void setData(Object data) { setData((String)data); }
 
+        MyStringNode(String initialData) {
+            this.data = initialData;
+        }
+
         @Override
         void setData(String data) {
             System.out.println("Setting: " + data);
