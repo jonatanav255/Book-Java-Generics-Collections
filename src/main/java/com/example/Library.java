@@ -59,7 +59,67 @@ public class Library {
         System.out.println("Total books: " + books.size());
     }
 
+    public boolean borrowBook(String title, String personName) {
+        Book book = findByTitle(title);
+        if (book == null) {
+            System.out.println("Book not found: " + title);
+            return false;
+        }
+
+        if (book.borrowBook(personName)) {
+            System.out.println(personName + " borrowed: " + book.getTitle());
+            return true;
+        } else {
+            System.out.println("Book already borrowed by: " + book.getBorrowedBy());
+            return false;
+        }
+    }
+
+    public boolean returnBook(String title) {
+        Book book = findByTitle(title);
+        if (book == null) {
+            System.out.println("Book not found: " + title);
+            return false;
+        }
+
+        if (book.returnBook()) {
+            System.out.println("Book returned: " + book.getTitle());
+            return true;
+        } else {
+            System.out.println("Book was not borrowed: " + book.getTitle());
+            return false;
+        }
+    }
+
+    public List<Book> getAvailableBooks() {
+        List<Book> available = new ArrayList<>();
+        for (Book book : books) {
+            if (!book.isBorrowed()) {
+                available.add(book);
+            }
+        }
+        return available;
+    }
+
+    public List<Book> getBorrowedBooks() {
+        List<Book> borrowed = new ArrayList<>();
+        for (Book book : books) {
+            if (book.isBorrowed()) {
+                borrowed.add(book);
+            }
+        }
+        return borrowed;
+    }
+
     public int getTotalBooks() {
         return books.size();
+    }
+
+    public int getAvailableCount() {
+        return getAvailableBooks().size();
+    }
+
+    public int getBorrowedCount() {
+        return getBorrowedBooks().size();
     }
 }

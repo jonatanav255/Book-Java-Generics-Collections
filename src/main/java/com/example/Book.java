@@ -5,12 +5,16 @@ public class Book {
     private String author;
     private int year;
     private String isbn;
+    private boolean isBorrowed;
+    private String borrowedBy;
 
     public Book(String title, String author, int year, String isbn) {
         this.title = title;
         this.author = author;
         this.year = year;
         this.isbn = isbn;
+        this.isBorrowed = false;
+        this.borrowedBy = null;
     }
 
     public String getTitle() {
@@ -29,8 +33,35 @@ public class Book {
         return isbn;
     }
 
+    public boolean isBorrowed() {
+        return isBorrowed;
+    }
+
+    public String getBorrowedBy() {
+        return borrowedBy;
+    }
+
+    public boolean borrowBook(String personName) {
+        if (!isBorrowed) {
+            isBorrowed = true;
+            borrowedBy = personName;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean returnBook() {
+        if (isBorrowed) {
+            isBorrowed = false;
+            borrowedBy = null;
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
-        return "'" + title + "' by " + author + " (" + year + ")";
+        String status = isBorrowed ? " [Borrowed by " + borrowedBy + "]" : " [Available]";
+        return "'" + title + "' by " + author + " (" + year + ")" + status;
     }
 }
