@@ -7,12 +7,14 @@ public class Book {
     private String isbn;
     private boolean isBorrowed;
     private String borrowedBy;
+    private Category category;
 
-    public Book(String title, String author, int year, String isbn) {
+    public Book(String title, String author, int year, String isbn, Category category) {
         this.title = title;
         this.author = author;
         this.year = year;
         this.isbn = isbn;
+        this.category = category;
         this.isBorrowed = false;
         this.borrowedBy = null;
     }
@@ -41,6 +43,10 @@ public class Book {
         return borrowedBy;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
     public boolean borrowBook(String personName) {
         if (!isBorrowed) {
             isBorrowed = true;
@@ -62,6 +68,6 @@ public class Book {
     @Override
     public String toString() {
         String status = isBorrowed ? " [Borrowed by " + borrowedBy + "]" : " [Available]";
-        return "'" + title + "' by " + author + " (" + year + ")" + status;
+        return "'" + title + "' by " + author + " (" + year + ") - " + category + status;
     }
 }

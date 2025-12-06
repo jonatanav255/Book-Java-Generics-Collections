@@ -122,4 +122,37 @@ public class Library {
     public int getBorrowedCount() {
         return getBorrowedBooks().size();
     }
+
+    public List<Book> findByCategory(Category category) {
+        List<Book> result = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getCategory() == category) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
+
+    public List<Book> findByYearRange(int minYear, int maxYear) {
+        List<Book> result = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getYear() >= minYear && book.getYear() <= maxYear) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
+
+    public void listBooksByCategory() {
+        System.out.println("\n=== Books by Category ===");
+        for (Category category : Category.values()) {
+            List<Book> booksInCategory = findByCategory(category);
+            if (!booksInCategory.isEmpty()) {
+                System.out.println("\n" + category + ":");
+                for (Book book : booksInCategory) {
+                    System.out.println("  - " + book);
+                }
+            }
+        }
+    }
 }
