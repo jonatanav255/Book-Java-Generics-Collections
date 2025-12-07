@@ -118,6 +118,61 @@ public class LibraryApp {
             System.out.println("  - " + book + " (Read " + book.getTimesRead() + " times)");
         }
 
+        System.out.println("\n--- RESERVATION SYSTEM DEMO ---");
+        System.out.println("\n--- David tries to reserve 1984 (already borrowed by Alice) ---");
+        if (library.reserveBook("1984", "David")) {
+            System.out.println("David successfully reserved 1984");
+        }
+
+        System.out.println("\n--- Eve also reserves 1984 ---");
+        if (library.reserveBook("1984", "Eve")) {
+            System.out.println("Eve successfully reserved 1984");
+        }
+
+        System.out.println("\n--- Frank tries to reserve 1984 too ---");
+        if (library.reserveBook("1984", "Frank")) {
+            System.out.println("Frank successfully reserved 1984");
+        }
+
+        System.out.println("\n--- Current state of 1984 ---");
+        library.findByTitle("1984").ifPresent(book -> System.out.println(book));
+        library.showReservations("1984");
+
+        System.out.println("\n--- Alice returns 1984 (should auto-assign to David) ---");
+        if (library.returnBook("1984")) {
+            System.out.println("Book returned successfully");
+            library.findByTitle("1984").ifPresent(book ->
+                System.out.println("New status: " + book)
+            );
+        }
+
+        System.out.println("\n--- Check remaining reservations for 1984 ---");
+        library.showReservations("1984");
+
+        System.out.println("\n--- Eve cancels her reservation ---");
+        if (library.cancelReservation("1984", "Eve")) {
+            System.out.println("Eve's reservation cancelled");
+        }
+
+        System.out.println("\n--- Final reservations for 1984 ---");
+        library.showReservations("1984");
+
+        System.out.println("\n--- David returns 1984 (should auto-assign to Frank) ---");
+        if (library.returnBook("1984")) {
+            System.out.println("Book returned successfully");
+            library.findByTitle("1984").ifPresent(book ->
+                System.out.println("New status: " + book)
+            );
+        }
+
+        System.out.println("\n--- Frank returns 1984 (no more reservations) ---");
+        if (library.returnBook("1984")) {
+            System.out.println("Book returned successfully");
+            library.findByTitle("1984").ifPresent(book ->
+                System.out.println("New status: " + book)
+            );
+        }
+
         library.showOverdueReport();
     }
 }

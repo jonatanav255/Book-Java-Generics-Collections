@@ -103,6 +103,58 @@ public class Library {
         return bookOpt.get().returnBook();
     }
 
+    public boolean reserveBook(String title, String personName) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
+        if (personName == null || personName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Person name cannot be null or empty");
+        }
+
+        Optional<Book> bookOpt = findByTitle(title);
+        if (!bookOpt.isPresent()) {
+            return false;
+        }
+
+        return bookOpt.get().reserveBook(personName);
+    }
+
+    public boolean cancelReservation(String title, String personName) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
+        if (personName == null || personName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Person name cannot be null or empty");
+        }
+
+        Optional<Book> bookOpt = findByTitle(title);
+        if (!bookOpt.isPresent()) {
+            return false;
+        }
+
+        return bookOpt.get().cancelReservation(personName);
+    }
+
+    public void showReservations(String title) {
+        Optional<Book> bookOpt = findByTitle(title);
+        if (!bookOpt.isPresent()) {
+            System.out.println("Book not found: " + title);
+            return;
+        }
+
+        Book book = bookOpt.get();
+        System.out.println("\n=== Reservations for: " + book.getTitle() + " ===");
+        if (book.getReservationCount() == 0) {
+            System.out.println("No reservations");
+        } else {
+            int position = 1;
+            for (String person : book.getReservations()) {
+                System.out.println(position + ". " + person);
+                position++;
+            }
+        }
+    }
+
     public List<Book> getAvailableBooks() {
         return books.values().stream()
             .filter(book -> !book.isBorrowed())

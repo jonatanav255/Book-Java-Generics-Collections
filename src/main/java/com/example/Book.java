@@ -1,7 +1,9 @@
 package com.example;
 
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Queue;
 
 public class Book {
     public static final int DEFAULT_BORROW_DAYS = 14;
@@ -18,6 +20,7 @@ public class Book {
     private double rating;
     private int timesRead;
     private LocalDate dueDate;
+    private Queue<String> reservations;
 
     public Book(String title, String author, int year, String isbn, Category category) {
         if (title == null || title.trim().isEmpty()) {
@@ -46,6 +49,7 @@ public class Book {
         this.rating = 0.0;
         this.timesRead = 0;
         this.dueDate = null;
+        this.reservations = new LinkedList<>();
     }
 
     public String getTitle() {
@@ -113,9 +117,16 @@ public class Book {
 
     public boolean returnBook() {
         if (isBorrowed) {
-            isBorrowed = false;
-            borrowedBy = null;
-            dueDate = null;
+            String nextPerson = reservations.poll();
+            if (nextPerson != null) {
+                borrowedBy = nextPerson;
+                timesRead++;
+                dueDate = LocalDate.now().plusDays(DEFAULT_BORROW_DAYS);
+            } else {
+                isBorrowed = false;
+                borrowedBy = null;
+                dueDate = null;
+            }
             return true;
         }
         return false;
@@ -133,6 +144,39 @@ public class Book {
             return LocalDate.now().toEpochDay() - dueDate.toEpochDay();
         }
         return 0;
+    }
+
+    public boolean reserveBook(String personName) {
+        if (personName == null || personName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Person name cannot be null or empty");
+        }
+        if (!isBorrowed) {
+            return false;
+        }
+        if (reservations.contains(personName.trim())) {
+            return false;
+        }
+        reservations.offer(personName.trim());
+        return true;
+    }
+
+    public boolean cancelReservation(String personName) {
+        if (personName == null || personName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Person name cannot be null or empty");
+        }
+        return reservations.remove(personName.trim());
+    }
+
+    public Queue<String> getReservations() {
+        return new LinkedList<>(reservations);
+    }
+
+    public int getReservationCount() {
+        return reservations.size();
+    }
+
+    public String getNextReservation() {
+        return reservations.peek();
     }
 
     @Override
@@ -153,6 +197,7 @@ public class Book {
         String status = isBorrowed ? " [Borrowed by " + borrowedBy + "]" : " [Available]";
         String ratingStr = rating > 0 ? " ★" + rating : "";
         String overdueStr = isOverdue() ? " OVERDUE!" : "";
-        return "'" + title + "' by " + author + " (" + year + ") - " + category + ratingStr + status + overdueStr;
+        String reservationStr = reservations.size() > 0 ? " [" + reservations.size() + " reservation(s)]" : "";
+        return "'" + title + "' by " + author + " (" + year + ") - " + category + ratingStr + status + overdueStr + reservationStr;
     }
 }
