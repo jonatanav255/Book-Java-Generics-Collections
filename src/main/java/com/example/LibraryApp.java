@@ -14,13 +14,18 @@ public class LibraryApp {
         Book book6 = new Book("The Hobbit", "J.R.R. Tolkien", 1937, "978-0547928227", Category.FANTASY);
         Book book7 = new Book("Steve Jobs", "Walter Isaacson", 2011, "978-1451648539", Category.BIOGRAPHY);
 
-        library.addBook(book1);
-        library.addBook(book2);
-        library.addBook(book3);
-        library.addBook(book4);
-        library.addBook(book5);
-        library.addBook(book6);
-        library.addBook(book7);
+        if (library.addBook(book1)) System.out.println("Added: " + book1);
+        if (library.addBook(book2)) System.out.println("Added: " + book2);
+        if (library.addBook(book3)) System.out.println("Added: " + book3);
+        if (library.addBook(book4)) System.out.println("Added: " + book4);
+        if (library.addBook(book5)) System.out.println("Added: " + book5);
+        if (library.addBook(book6)) System.out.println("Added: " + book6);
+        if (library.addBook(book7)) System.out.println("Added: " + book7);
+
+        System.out.println("\n--- Testing duplicate prevention ---");
+        if (!library.addBook(book1)) {
+            System.out.println("Correctly rejected duplicate: " + book1.getTitle());
+        }
 
         library.listAllBooks();
 
@@ -51,19 +56,35 @@ public class LibraryApp {
         library.listBooksByCategory();
 
         System.out.println("\n--- Rating some books ---");
-        library.rateBook("1984", 4.8);
-        library.rateBook("The Hobbit", 4.5);
-        library.rateBook("Dune", 4.9);
-        library.rateBook("Steve Jobs", 4.2);
+        if (library.rateBook("1984", 4.8)) {
+            System.out.println("Rated '1984' with 4.8 stars");
+        }
+        if (library.rateBook("The Hobbit", 4.5)) {
+            System.out.println("Rated 'The Hobbit' with 4.5 stars");
+        }
+        if (library.rateBook("Dune", 4.9)) {
+            System.out.println("Rated 'Dune' with 4.9 stars");
+        }
+        if (library.rateBook("Steve Jobs", 4.2)) {
+            System.out.println("Rated 'Steve Jobs' with 4.2 stars");
+        }
+        if (!library.rateBook("NonExistent Book", 5.0)) {
+            System.out.println("Book not found: NonExistent Book");
+        }
 
-        System.out.println("\n--- Alice borrows 1984 for 14 days ---");
-        library.borrowBook("1984", "Alice", 14);
-
-        System.out.println("\n--- Bob borrows Dune for 7 days ---");
-        library.borrowBook("Dune", "Bob", 7);
-
-        System.out.println("\n--- Charlie borrows The Hobbit for 1 day (will be overdue for demo) ---");
-        library.borrowBook("The Hobbit", "Charlie", 1);
+        System.out.println("\n--- Borrowing books ---");
+        if (library.borrowBook("1984", "Alice", 14)) {
+            System.out.println("Alice borrowed: 1984");
+        }
+        if (library.borrowBook("Dune", "Bob", 7)) {
+            System.out.println("Bob borrowed: Dune");
+        }
+        if (library.borrowBook("The Hobbit", "Charlie", 1)) {
+            System.out.println("Charlie borrowed: The Hobbit (will be overdue for demo)");
+        }
+        if (!library.borrowBook("1984", "David", 14)) {
+            System.out.println("Cannot borrow: 1984 is already borrowed");
+        }
 
         library.listAllBooks();
 
