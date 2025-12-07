@@ -2,51 +2,58 @@ package com.example;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Library {
-    private List<Book> books;
+    private Map<String, Book> books;
     private String name;
 
     public Library(String name) {
-        this.name = name;
-        this.books = new ArrayList<>();
-    }
-
-    public void addBook(Book book) {
-        books.add(book);
-        System.out.println("Added: " + book);
-    }
-
-    public void removeBook(String isbn) {
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getIsbn().equals(isbn)) {
-                Book removed = books.remove(i);
-                System.out.println("Removed: " + removed);
-                return;
-            }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Library name cannot be null or empty");
         }
-        System.out.println("Book not found with ISBN: " + isbn);
+        this.name = name.trim();
+        this.books = new HashMap<>();
     }
 
-    public Book findByTitle(String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                return book;
-            }
+    public boolean addBook(Book book) {
+        if (book == null) {
+            throw new IllegalArgumentException("Book cannot be null");
         }
-        return null;
+        if (books.containsKey(book.getIsbn())) {
+            return false;
+        }
+        books.put(book.getIsbn(), book);
+        return true;
+    }
+
+    public boolean removeBook(String isbn) {
+        if (isbn == null || isbn.trim().isEmpty()) {
+            throw new IllegalArgumentException("ISBN cannot be null or empty");
+        }
+        return books.remove(isbn.trim()) != null;
+    }
+
+    public Optional<Book> findByTitle(String title) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
+        return books.values().stream()
+            .filter(book -> book.getTitle().equalsIgnoreCase(title.trim()))
+            .findFirst();
     }
 
     public List<Book> findByAuthor(String author) {
-        List<Book> result = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getAuthor().equalsIgnoreCase(author)) {
-                result.add(book);
-            }
+        if (author == null || author.trim().isEmpty()) {
+            throw new IllegalArgumentException("Author cannot be null or empty");
         }
-        return result;
+        return books.values().stream()
+            .filter(book -> book.getAuthor().equalsIgnoreCase(author.trim()))
+            .collect(Collectors.toList());
     }
 
     public void listAllBooks() {
@@ -54,67 +61,58 @@ public class Library {
         if (books.isEmpty()) {
             System.out.println("No books in the library.");
         } else {
-            for (int i = 0; i < books.size(); i++) {
-                System.out.println((i + 1) + ". " + books.get(i));
+            List<Book> bookList = new ArrayList<>(books.values());
+            for (int i = 0; i < bookList.size(); i++) {
+                System.out.println((i + 1) + ". " + bookList.get(i));
             }
         }
         System.out.println("Total books: " + books.size());
     }
 
     public boolean borrowBook(String title, String personName) {
-        return borrowBook(title, personName, 14);
+        return borrowBook(title, personName, Book.DEFAULT_BORROW_DAYS);
     }
 
     public boolean borrowBook(String title, String personName, int daysToReturn) {
-        Book book = findByTitle(title);
-        if (book == null) {
-            System.out.println("Book not found: " + title);
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
+        if (personName == null || personName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Person name cannot be null or empty");
+        }
+
+        Optional<Book> bookOpt = findByTitle(title);
+        if (!bookOpt.isPresent()) {
             return false;
         }
 
-        if (book.borrowBook(personName, daysToReturn)) {
-            System.out.println(personName + " borrowed: " + book.getTitle() + " (Due: " + book.getDueDate() + ")");
-            return true;
-        } else {
-            System.out.println("Book already borrowed by: " + book.getBorrowedBy());
-            return false;
-        }
+        Book book = bookOpt.get();
+        return book.borrowBook(personName, daysToReturn);
     }
 
     public boolean returnBook(String title) {
-        Book book = findByTitle(title);
-        if (book == null) {
-            System.out.println("Book not found: " + title);
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
+
+        Optional<Book> bookOpt = findByTitle(title);
+        if (!bookOpt.isPresent()) {
             return false;
         }
 
-        if (book.returnBook()) {
-            System.out.println("Book returned: " + book.getTitle());
-            return true;
-        } else {
-            System.out.println("Book was not borrowed: " + book.getTitle());
-            return false;
-        }
+        return bookOpt.get().returnBook();
     }
 
     public List<Book> getAvailableBooks() {
-        List<Book> available = new ArrayList<>();
-        for (Book book : books) {
-            if (!book.isBorrowed()) {
-                available.add(book);
-            }
-        }
-        return available;
+        return books.values().stream()
+            .filter(book -> !book.isBorrowed())
+            .collect(Collectors.toList());
     }
 
     public List<Book> getBorrowedBooks() {
-        List<Book> borrowed = new ArrayList<>();
-        for (Book book : books) {
-            if (book.isBorrowed()) {
-                borrowed.add(book);
-            }
-        }
-        return borrowed;
+        return books.values().stream()
+            .filter(Book::isBorrowed)
+            .collect(Collectors.toList());
     }
 
     public int getTotalBooks() {
@@ -130,23 +128,21 @@ public class Library {
     }
 
     public List<Book> findByCategory(Category category) {
-        List<Book> result = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getCategory() == category) {
-                result.add(book);
-            }
+        if (category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
         }
-        return result;
+        return books.values().stream()
+            .filter(book -> book.getCategory() == category)
+            .collect(Collectors.toList());
     }
 
     public List<Book> findByYearRange(int minYear, int maxYear) {
-        List<Book> result = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getYear() >= minYear && book.getYear() <= maxYear) {
-                result.add(book);
-            }
+        if (minYear > maxYear) {
+            throw new IllegalArgumentException("minYear cannot be greater than maxYear");
         }
-        return result;
+        return books.values().stream()
+            .filter(book -> book.getYear() >= minYear && book.getYear() <= maxYear)
+            .collect(Collectors.toList());
     }
 
     public void listBooksByCategory() {
@@ -163,41 +159,46 @@ public class Library {
     }
 
     public List<Book> findByMinimumRating(double minRating) {
-        List<Book> result = new ArrayList<>();
-        for (Book book : books) {
-            if (book.getRating() >= minRating) {
-                result.add(book);
-            }
+        if (minRating < 0.0 || minRating > 5.0) {
+            throw new IllegalArgumentException("Rating must be between 0.0 and 5.0");
         }
-        return result;
+        return books.values().stream()
+            .filter(book -> book.getRating() >= minRating)
+            .collect(Collectors.toList());
     }
 
     public List<Book> getOverdueBooks() {
-        List<Book> overdue = new ArrayList<>();
-        for (Book book : books) {
-            if (book.isOverdue()) {
-                overdue.add(book);
-            }
-        }
-        return overdue;
+        return books.values().stream()
+            .filter(Book::isOverdue)
+            .collect(Collectors.toList());
     }
 
     public List<Book> getMostPopularBooks(int count) {
-        return books.stream()
+        if (count <= 0) {
+            throw new IllegalArgumentException("Count must be positive");
+        }
+        return books.values().stream()
             .filter(book -> book.getTimesRead() > 0)
             .sorted(Comparator.comparingInt(Book::getTimesRead).reversed())
             .limit(count)
             .collect(Collectors.toList());
     }
 
-    public void rateBook(String title, double rating) {
-        Book book = findByTitle(title);
-        if (book != null) {
-            book.setRating(rating);
-            System.out.println("Rated '" + book.getTitle() + "' with " + rating + " stars");
-        } else {
-            System.out.println("Book not found: " + title);
+    public boolean rateBook(String title, double rating) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
         }
+        if (rating < 0.0 || rating > 5.0) {
+            throw new IllegalArgumentException("Rating must be between 0.0 and 5.0");
+        }
+
+        Optional<Book> bookOpt = findByTitle(title);
+        if (!bookOpt.isPresent()) {
+            return false;
+        }
+
+        bookOpt.get().setRating(rating);
+        return true;
     }
 
     public void showOverdueReport() {
