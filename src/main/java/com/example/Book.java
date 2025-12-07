@@ -1,8 +1,13 @@
 package com.example;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Book {
+    public static final int DEFAULT_BORROW_DAYS = 14;
+    private static final int MIN_VALID_YEAR = 1000;
+    private static final int MAX_VALID_YEAR = LocalDate.now().getYear() + 1;
+
     private String title;
     private String author;
     private int year;
@@ -15,10 +20,26 @@ public class Book {
     private LocalDate dueDate;
 
     public Book(String title, String author, int year, String isbn, Category category) {
-        this.title = title;
-        this.author = author;
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
+        }
+        if (author == null || author.trim().isEmpty()) {
+            throw new IllegalArgumentException("Author cannot be null or empty");
+        }
+        if (isbn == null || isbn.trim().isEmpty()) {
+            throw new IllegalArgumentException("ISBN cannot be null or empty");
+        }
+        if (year < MIN_VALID_YEAR || year > MAX_VALID_YEAR) {
+            throw new IllegalArgumentException("Year must be between " + MIN_VALID_YEAR + " and " + MAX_VALID_YEAR);
+        }
+        if (category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
+        }
+
+        this.title = title.trim();
+        this.author = author.trim();
         this.year = year;
-        this.isbn = isbn;
+        this.isbn = isbn.trim();
         this.category = category;
         this.isBorrowed = false;
         this.borrowedBy = null;
@@ -74,9 +95,15 @@ public class Book {
     }
 
     public boolean borrowBook(String personName, int daysToReturn) {
+        if (personName == null || personName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Person name cannot be null or empty");
+        }
+        if (daysToReturn <= 0) {
+            throw new IllegalArgumentException("Days to return must be positive");
+        }
         if (!isBorrowed) {
             isBorrowed = true;
-            borrowedBy = personName;
+            borrowedBy = personName.trim();
             timesRead++;
             dueDate = LocalDate.now().plusDays(daysToReturn);
             return true;
@@ -106,6 +133,19 @@ public class Book {
             return LocalDate.now().toEpochDay() - dueDate.toEpochDay();
         }
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return isbn.equals(book.isbn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isbn);
     }
 
     @Override
