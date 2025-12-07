@@ -1,7 +1,9 @@
 package com.example;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Library {
     private List<Book> books;
@@ -60,14 +62,18 @@ public class Library {
     }
 
     public boolean borrowBook(String title, String personName) {
+        return borrowBook(title, personName, 14);
+    }
+
+    public boolean borrowBook(String title, String personName, int daysToReturn) {
         Book book = findByTitle(title);
         if (book == null) {
             System.out.println("Book not found: " + title);
             return false;
         }
 
-        if (book.borrowBook(personName)) {
-            System.out.println(personName + " borrowed: " + book.getTitle());
+        if (book.borrowBook(personName, daysToReturn)) {
+            System.out.println(personName + " borrowed: " + book.getTitle() + " (Due: " + book.getDueDate() + ")");
             return true;
         } else {
             System.out.println("Book already borrowed by: " + book.getBorrowedBy());
@@ -152,6 +158,56 @@ public class Library {
                 for (Book book : booksInCategory) {
                     System.out.println("  - " + book);
                 }
+            }
+        }
+    }
+
+    public List<Book> findByMinimumRating(double minRating) {
+        List<Book> result = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getRating() >= minRating) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
+
+    public List<Book> getOverdueBooks() {
+        List<Book> overdue = new ArrayList<>();
+        for (Book book : books) {
+            if (book.isOverdue()) {
+                overdue.add(book);
+            }
+        }
+        return overdue;
+    }
+
+    public List<Book> getMostPopularBooks(int count) {
+        return books.stream()
+            .filter(book -> book.getTimesRead() > 0)
+            .sorted(Comparator.comparingInt(Book::getTimesRead).reversed())
+            .limit(count)
+            .collect(Collectors.toList());
+    }
+
+    public void rateBook(String title, double rating) {
+        Book book = findByTitle(title);
+        if (book != null) {
+            book.setRating(rating);
+            System.out.println("Rated '" + book.getTitle() + "' with " + rating + " stars");
+        } else {
+            System.out.println("Book not found: " + title);
+        }
+    }
+
+    public void showOverdueReport() {
+        List<Book> overdueBooks = getOverdueBooks();
+        System.out.println("\n=== Overdue Books Report ===");
+        if (overdueBooks.isEmpty()) {
+            System.out.println("No overdue books!");
+        } else {
+            for (Book book : overdueBooks) {
+                System.out.println("  - " + book + " (" + book.getDaysOverdue() + " days overdue)");
             }
         }
     }

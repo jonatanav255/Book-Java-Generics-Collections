@@ -1,5 +1,7 @@
 package com.example;
 
+import java.time.LocalDate;
+
 public class Book {
     private String title;
     private String author;
@@ -8,6 +10,9 @@ public class Book {
     private boolean isBorrowed;
     private String borrowedBy;
     private Category category;
+    private double rating;
+    private int timesRead;
+    private LocalDate dueDate;
 
     public Book(String title, String author, int year, String isbn, Category category) {
         this.title = title;
@@ -17,6 +22,9 @@ public class Book {
         this.category = category;
         this.isBorrowed = false;
         this.borrowedBy = null;
+        this.rating = 0.0;
+        this.timesRead = 0;
+        this.dueDate = null;
     }
 
     public String getTitle() {
@@ -47,10 +55,30 @@ public class Book {
         return category;
     }
 
-    public boolean borrowBook(String personName) {
+    public double getRating() {
+        return rating;
+    }
+
+    public int getTimesRead() {
+        return timesRead;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setRating(double rating) {
+        if (rating >= 0.0 && rating <= 5.0) {
+            this.rating = rating;
+        }
+    }
+
+    public boolean borrowBook(String personName, int daysToReturn) {
         if (!isBorrowed) {
             isBorrowed = true;
             borrowedBy = personName;
+            timesRead++;
+            dueDate = LocalDate.now().plusDays(daysToReturn);
             return true;
         }
         return false;
@@ -60,14 +88,31 @@ public class Book {
         if (isBorrowed) {
             isBorrowed = false;
             borrowedBy = null;
+            dueDate = null;
             return true;
         }
         return false;
     }
 
+    public boolean isOverdue() {
+        if (isBorrowed && dueDate != null) {
+            return LocalDate.now().isAfter(dueDate);
+        }
+        return false;
+    }
+
+    public long getDaysOverdue() {
+        if (isOverdue()) {
+            return LocalDate.now().toEpochDay() - dueDate.toEpochDay();
+        }
+        return 0;
+    }
+
     @Override
     public String toString() {
         String status = isBorrowed ? " [Borrowed by " + borrowedBy + "]" : " [Available]";
-        return "'" + title + "' by " + author + " (" + year + ") - " + category + status;
+        String ratingStr = rating > 0 ? " ★" + rating : "";
+        String overdueStr = isOverdue() ? " OVERDUE!" : "";
+        return "'" + title + "' by " + author + " (" + year + ") - " + category + ratingStr + status + overdueStr;
     }
 }

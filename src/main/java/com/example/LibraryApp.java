@@ -50,11 +50,20 @@ public class LibraryApp {
 
         library.listBooksByCategory();
 
-        System.out.println("\n--- Alice borrows 1984 ---");
-        library.borrowBook("1984", "Alice");
+        System.out.println("\n--- Rating some books ---");
+        library.rateBook("1984", 4.8);
+        library.rateBook("The Hobbit", 4.5);
+        library.rateBook("Dune", 4.9);
+        library.rateBook("Steve Jobs", 4.2);
 
-        System.out.println("\n--- Bob borrows Dune ---");
-        library.borrowBook("Dune", "Bob");
+        System.out.println("\n--- Alice borrows 1984 for 14 days ---");
+        library.borrowBook("1984", "Alice", 14);
+
+        System.out.println("\n--- Bob borrows Dune for 7 days ---");
+        library.borrowBook("Dune", "Bob", 7);
+
+        System.out.println("\n--- Charlie borrows The Hobbit for 1 day (will be overdue for demo) ---");
+        library.borrowBook("The Hobbit", "Charlie", 1);
 
         library.listAllBooks();
 
@@ -75,5 +84,19 @@ public class LibraryApp {
         for (Book book : orwellBooks) {
             System.out.println("  - " + book);
         }
+
+        System.out.println("\n--- Books with rating 4.5 or higher ---");
+        List<Book> highRated = library.findByMinimumRating(4.5);
+        for (Book book : highRated) {
+            System.out.println("  - " + book);
+        }
+
+        System.out.println("\n--- Most popular books (Top 3) ---");
+        List<Book> popularBooks = library.getMostPopularBooks(3);
+        for (Book book : popularBooks) {
+            System.out.println("  - " + book + " (Read " + book.getTimesRead() + " times)");
+        }
+
+        library.showOverdueReport();
     }
 }
