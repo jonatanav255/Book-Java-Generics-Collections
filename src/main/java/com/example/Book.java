@@ -21,6 +21,7 @@ public class Book {
     private int timesRead;
     private LocalDate dueDate;
     private Queue<String> reservations;
+    private Fine currentFine;
 
     public Book(String title, String author, int year, String isbn, Category category) {
         if (title == null || title.trim().isEmpty()) {
@@ -179,6 +180,25 @@ public class Book {
         return reservations.peek();
     }
 
+    public Fine getCurrentFine() {
+        return currentFine;
+    }
+
+    public void setCurrentFine(Fine fine) {
+        this.currentFine = fine;
+    }
+
+    public boolean hasFine() {
+        return currentFine != null && !currentFine.isPaid();
+    }
+
+    /**
+     * FOR TESTING ONLY - Set a custom due date to simulate overdue books.
+     */
+    void setDueDateForTesting(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -198,6 +218,7 @@ public class Book {
         String ratingStr = rating > 0 ? " ★" + rating : "";
         String overdueStr = isOverdue() ? " OVERDUE!" : "";
         String reservationStr = reservations.size() > 0 ? " [" + reservations.size() + " reservation(s)]" : "";
-        return "'" + title + "' by " + author + " (" + year + ") - " + category + ratingStr + status + overdueStr + reservationStr;
+        String fineStr = hasFine() ? " [FINE: $" + currentFine.getAmountRemaining() + "]" : "";
+        return "'" + title + "' by " + author + " (" + year + ") - " + category + ratingStr + status + overdueStr + reservationStr + fineStr;
     }
 }
